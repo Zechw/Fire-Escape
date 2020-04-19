@@ -15,13 +15,13 @@ public class GameBoard : MonoBehaviour
 
     public GameController gameController;
 
+    //render layers
     private FloorLayer floorLayer;
     private FireLayer fireLayer;
     private ToonLayer toonLayer;
     private ExitLayer exitLayer;
 
-    public SpriteLayerBase[] spriteLayers;
-    //FIXME; has duplicate references; indidual & in list. Pick one implementation?
+    public Grid levelGrid;
 
     private GridLayout gridLayout;
 
@@ -37,17 +37,19 @@ public class GameBoard : MonoBehaviour
         toonLayer = gameObject.GetComponentInChildren<ToonLayer>();
         exitLayer = gameObject.GetComponentInChildren<ExitLayer>();
 
-        spriteLayers = gameObject.GetComponentsInChildren<SpriteLayerBase>();
-
         LoadTilemaps();
 
+    }
+
+    private void Start()
+    {
+        RenderTiles();
     }
 
     private void LoadTilemaps()
     {        //TODO: efficency - this gets a lot of empy space
         //load tilemaps into gameBoard
-        BoundsInt boardBounds = floorLayer.tilemap.cellBounds;
-        Debug.Log(boardBounds);
+        BoundsInt boardBounds = levelGrid.GetComponentInChildren<Tilemap>().cellBounds; //fixme only looks at first layer
 
         GameController.GameState gameState; 
         gameState.gameSpaces = new GameController.FloorTypes[boardBounds.size.x, boardBounds.size.y];
@@ -62,9 +64,9 @@ public class GameBoard : MonoBehaviour
         foreach (Vector3Int tilemapPosition in boardBounds.allPositionsWithin)
         {
             List<TileBase> sprites = new List<TileBase>();
-            foreach (SpriteLayerBase layer in spriteLayers)
+            foreach (Tilemap layer in levelGrid.GetComponentsInChildren<Tilemap>())
             {
-                TileBase tileFromMap = layer.tilemap.GetTile(tilemapPosition);
+                TileBase tileFromMap = layer.GetTile(tilemapPosition);
                 if (tileFromMap != null)
                 {
                     sprites.Add(tileFromMap);
@@ -110,16 +112,11 @@ public class GameBoard : MonoBehaviour
         gameController = new GameController(gameState);
     }
 
-    private void Start()
-    {
-        RenderTiles();
-    }
-
     // place tiles in desired positions, for rendering
     private void RenderTiles()
     {
         //clear
-        foreach (SpriteLayerBase l in spriteLayers)
+        foreach (SpriteLayerBase l in new SpriteLayerBase[] { floorLayer, toonLayer, fireLayer, exitLayer })
         {
             l.tilemap.ClearAllTiles();
         }
@@ -133,9 +130,7 @@ public class GameBoard : MonoBehaviour
                 switch (gameController.gameSpaces[x,y])
                 {
                     case GameController.FloorTypes.None:
-                        tile = unknownTile;
-                        //TODO continue
-                        break;
+                        continue;
                     case GameController.FloorTypes.Normal:
                         tile = unburntfloorTile;
                         break;

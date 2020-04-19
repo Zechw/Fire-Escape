@@ -26,7 +26,7 @@ public class CameraControl : MonoBehaviour
             Debug.LogError("Camera doesn't know this cell layout");
         }
 
-        //TODO also zoom
+        gameObject.GetComponent<Camera>().orthographicSize = Mathf.Max(boardSize.x, boardSize.y);
         
     }
 

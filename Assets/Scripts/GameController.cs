@@ -35,6 +35,7 @@ public class GameController
         toons = state.toons;
         fires = state.fires;
         exits = state.exits;
+        BurnFloors();
     }
 
     //TODO is there strut magic for this?
@@ -48,25 +49,6 @@ public class GameController
         state.exits = exits;
         return state;
     }
-
-/*
-    private void GenTestLvl() { 
-    //generate test
-    //toons
-    toons = new List<Vector2Int>();
-    toons.Add(new Vector2Int(2, 2));
-    toons.Add(new Vector2Int(4, 2));
-    //fires
-    fires = new List<Vector2Int>();
-    fires.Add(new Vector2Int(3, 2));
-    fires.Add(new Vector2Int(0, 0));
-    fires.Add(new Vector2Int(5, 0));
-    BurnFloors();
-    //exit
-    exits = new List<Vector2Int>();
-    exits.Add(new Vector2Int(2, 5));
-    }
-*/
 
     public Vector2Int GetSize()
     {
@@ -147,7 +129,7 @@ public class GameController
 
 
         toons[toonI] = ClampToBoard(new Vector2Int(newX, newY));
-        //FIXME check for obstacles.
+        //FIXME check for obstacles & "None" floors.
     }
 
     private void CheckBurns()
@@ -194,16 +176,14 @@ public class GameController
         List<Vector2Int> newFires = new List<Vector2Int>();
         foreach (Vector2Int fireLoc in fires)
         {
-            if (fireLoc == playLoc && gameSpaces[fireLoc.x, fireLoc.y] != FloorTypes.Normal) {
+            if (fireLoc == playLoc && gameSpaces[playLoc.x, playLoc.y] == FloorTypes.Normal) {
                 newFires.Add(playLoc);
-                continue;  //TODO cleaner? skip spreading recently placed fire
-                //FIXME bug; for some reason, the last fire, when clicked sticks around
-                // !gameSpaces seems to fix but not sure it should.
+                continue;
             }
             foreach (Vector2Int direction in cardinalDirections)
             {
                 Vector2Int newLoc = ClampToBoard(fireLoc + direction);
-                if (gameSpaces[newLoc.x, newLoc.y] == FloorTypes.Normal)
+                if (gameSpaces[newLoc.x, newLoc.y] == FloorTypes.Normal && fireLoc != playLoc)
                 {
                     newFires.Add(newLoc);
                 }

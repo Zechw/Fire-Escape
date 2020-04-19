@@ -9,5 +9,6 @@ public class FireLayer : SpriteLayerBase
     private float elapsedFlickerTime = 0f;
     private void Update()
     {
+        //TODO flicker
     }
 }
