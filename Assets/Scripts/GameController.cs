@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+// Holds all the logic and mechanics for how a game acts
 public class GameController
 {
     public enum FloorTypes { None, Normal, Burned }
@@ -121,15 +122,98 @@ public class GameController
         return safetyVector.normalized;
     }
 
+    private Vector2Int FindBestSpace(int toonI, Vector2 safetyVector)
+    {
+        //Debug.Log(safetyVector);
+        //Debug.DrawRay(new Vector3(toons[toonI].x, toons[toonI].y, 0), safetyVector, Color.green, 10f);
+        //Debug.Log(Vector2.SignedAngle(Vector2.up, safetyVector));
+
+        //only run straight when in row with fire. prefer diagonals.
+
+        if (safetyVector == Vector2.zero)
+        {
+            //no movement
+            return toons[toonI];
+        }
+
+        Vector2Int roundedVector = new Vector2Int(
+            (int)Mathf.Ceil(safetyVector.x),
+            (int)Mathf.Ceil(safetyVector.y)
+        );
+
+        Vector2Int desiredSpace = ClampToBoard(toons[toonI] + roundedVector);
+        if (IsSpaceLegalForToon(desiredSpace))
+        {
+            return desiredSpace;
+        } 
+
+        List<Vector2Int> testMoves = new List<Vector2Int>();
+        if (roundedVector.x == 0 || roundedVector.y == 0)
+        {
+            //direct move. try diagonals. (assumes rounded always prefer diag if desired; _Ceil_)
+            if (roundedVector.x == 0)
+            {
+                testMoves.Add(new Vector2Int(1, roundedVector.y));
+                testMoves.Add(new Vector2Int(-1, roundedVector.y));
+                //random shuffle?? how to preview (& stay consistant)?
+            }
+            else //y==0
+            {
+                testMoves.Add(new Vector2Int(roundedVector.x, 1));
+                testMoves.Add(new Vector2Int(roundedVector.x, -1));
+            }
+        }
+        else //diagonal move. try direct.
+        {
+            if (safetyVector.x > safetyVector.y)
+            {
+                testMoves.Add(new Vector2Int(roundedVector.x, 0));
+                testMoves.Add(new Vector2Int(0, roundedVector.y));
+            }
+            else // x> or equal. prefers y movement
+            {
+                testMoves.Add(new Vector2Int(0, roundedVector.y));
+                testMoves.Add(new Vector2Int(roundedVector.x, 0));
+            }
+        }
+
+        //return first legal testMove
+        foreach (Vector2Int move in testMoves)
+        {
+            Vector2Int space = ClampToBoard(toons[toonI] + move);
+            if (IsSpaceLegalForToon(space))
+            {
+                return space;
+            }
+        }
+
+        //No legal moves prefered.. sit still.
+        return toons[toonI];
+    }
+
     private void MoveToon(int toonI, Vector2 safetyVector)
     {
+        toons[toonI] = FindBestSpace(toonI, safetyVector);
+    }
 
-        int newX = toons[toonI].x + Mathf.RoundToInt(safetyVector.x);
-        int newY = toons[toonI].y + Mathf.RoundToInt(safetyVector.y);
+    private bool IsSpaceLegalForToon(Vector2Int loc)
+    {
+        if (gameSpaces[loc.x, loc.y] == FloorTypes.None)
+        {
+            return false;
+        }
 
+        //TODO obstacles
 
-        toons[toonI] = ClampToBoard(new Vector2Int(newX, newY));
-        //FIXME check for obstacles & "None" floors.
+        if (toons.Contains(loc)) //TODO decide if this is a good mechanic; or if they should stack
+        {
+            //already occupied
+            return false;
+        }
+
+        //TODO not run into fires? (edge case when it's priority; might not matter--have to save them running into spread)
+
+        return true;
     }
 
     private void CheckBurns()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+// Renders a game state (from GameController) onto a Unity Grid & Tilemaps
 public class GameBoard : MonoBehaviour
 {
     public Tile unburntfloorTile;

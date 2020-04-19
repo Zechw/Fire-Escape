@@ -14,22 +14,24 @@ public abstract class SpriteLayerBase: MonoBehaviour
     {
         gameBoard = gameObject.GetComponentInParent<GameBoard>();
         tilemap = gameObject.GetComponent<Tilemap>();
-       
 
-        tiles = GetAllTiles();
+    }
+
+    public void DebugLayer()
+    {
 
 
+        TileBase[]  tiles = GetAllTiles();
 
-
-        /*
+        
         Debug.Log("----");
         Debug.Log(gameObject.name);
         Debug.Log(tiles.Length);
         foreach (TileBase tile in tiles)
         {
-            Debug.Log(tile.GetTileData());
+            Debug.Log(tile);
         }
-        */
+        
         
     }
 
@@ -40,10 +42,6 @@ public abstract class SpriteLayerBase: MonoBehaviour
         if (tile != null)
         {
             Debug.Log(tile);
-            if (gameBoard.fireTile == tile)
-            {
-                Debug.Log("it's on fire!");
-            }
         }
     }
 
