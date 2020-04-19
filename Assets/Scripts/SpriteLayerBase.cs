@@ -6,14 +6,15 @@ using UnityEngine.Tilemaps;
 public abstract class SpriteLayerBase: MonoBehaviour
 {
     protected GameBoard gameBoard;
-    protected Tilemap tilemap;
+    public Tilemap tilemap;
 
     protected TileBase[] tiles;
 
-    private void Start()
+    private void Awake()
     {
         gameBoard = gameObject.GetComponentInParent<GameBoard>();
         tilemap = gameObject.GetComponent<Tilemap>();
+       
 
         tiles = GetAllTiles();
 
@@ -36,7 +37,6 @@ public abstract class SpriteLayerBase: MonoBehaviour
     public void DebugLoc(Vector3Int loc)
     {
         TileBase tile = tilemap.GetTile(loc);
-        Debug.Log(tile);
         if (tile != null)
         {
             Debug.Log(tile);

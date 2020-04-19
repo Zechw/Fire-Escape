@@ -5,24 +5,15 @@ using UnityEngine.Tilemaps;
 
 public class GameBoard : MonoBehaviour
 {
-    struct GameSpace
-    {
-
-    }
-
-    private int width;
-    private int height;
-   //private int[,];
-
-
-
-    private GridLayout gridLayout;
-
-    public Tile floorTile;
+    public Tile unburntfloorTile;
     public Tile burntFloorTile;
     public Tile fireTile;
     public Tile toonTile;
+    public Tile toonAwayTile;
     public Tile exitTile;
+    public Tile unknownTile;
+
+    public GameController gameController;
 
     private FloorLayer floorLayer;
     private FireLayer fireLayer;
@@ -31,9 +22,10 @@ public class GameBoard : MonoBehaviour
 
     public SpriteLayerBase[] spriteLayers;
     //FIXME; has duplicate references; indidual & in list. Pick one implementation?
-  
 
-    private void Start()
+    private GridLayout gridLayout;
+
+    private void Awake()
     {
         gridLayout = gameObject.GetComponent<GridLayout>();
 
@@ -44,17 +36,81 @@ public class GameBoard : MonoBehaviour
         exitLayer = gameObject.GetComponentInChildren<ExitLayer>();
 
         spriteLayers = gameObject.GetComponentsInChildren<SpriteLayerBase>();
+
+        /*
+        //load tilemaps into gameBoard
+        BoundsInt boardBounds = floorLayer.tilemap.cellBounds;
+        Debug.Log(boardBounds);
+        gameSpaces = new Tile[boardBounds.size.x, boardBounds.size.y];
+
+        //TODO: efficency - this gets a lot of empy space
+        foreach (Vector3Int position in boardBounds.allPositionsWithin)
+        {
+            TileBase tile = floorLayer.tilemap.GetTile( position );
+            if (tile != null)
+            {
+                floorLayer.tilemap.SetTile(position, unknownTile);
+            }
+        }
+        */
+
+        gameController = new GameController(6, 6);
     }
 
-    public void registerClick(Vector3 mousePosition)
+    private void Start()
     {
-        Vector3 worldPoint = Camera.main.ScreenToWorldPoint(mousePosition);
-        Vector3Int cellPosition = gridLayout.WorldToCell(worldPoint);
-        Debug.Log(cellPosition);
-        foreach (SpriteLayerBase layer in spriteLayers)
+        RenderTiles();
+    }
+
+    // place tiles in desired positions, for rendering
+    private void RenderTiles()
+    {
+        //clear
+        foreach (SpriteLayerBase l in spriteLayers)
         {
-            layer.DebugLoc(cellPosition);
+            l.tilemap.ClearAllTiles();
         }
-        
+        //floor
+        Vector2Int boardSize = gameController.GetSize();
+        for (int x = 0; x < boardSize.x; x++)
+        {
+            for (int y = 0; y < boardSize.y; y++)
+            {
+                floorLayer.tilemap.SetTile(
+                    new Vector3Int(x, y, 0),
+                    gameController.gameSpaces[x, y]? burntFloorTile : unburntfloorTile
+                );
+            }
+        }
+        //toons
+        foreach (Vector3Int toonLoc in gameController.toons)
+        {
+            toonLayer.tilemap.SetTile(toonLoc, toonTile);
+        }
+        //fires
+        foreach (Vector3Int fireLoc in gameController.fires)
+        {
+            fireLayer.tilemap.SetTile(fireLoc, fireTile);
+        }
+        //exits
+        foreach (Vector3Int exitLoc in gameController.exits)
+        {
+            exitLayer.tilemap.SetTile(exitLoc, exitTile);
+        }
+
+    }
+
+    private void OnMouseDown()
+    {
+        //only a colider on the floor layer; so clicks are relative to grid loc of mouse
+        // - could probably implement on it's own; not coupled to floor collider
+        // - if raycast, could save the collider & rigidbody
+        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3Int cellPosition = gridLayout.WorldToCell(mousePosition);
+
+        if (gameController.MakePlay(new Vector2Int(cellPosition.x, cellPosition.y)))
+        {
+            RenderTiles();
+        }
     }
 }

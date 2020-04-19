@@ -17,6 +17,33 @@ TextureImporter:
   - first:
       213: -2562969276243998059
     second: SquareSpriteSheet_4
+  - first:
+      213: -901653443065365756
+    second: SquareSpriteSheet_0
+  - first:
+      213: -8076797147143315147
+    second: SquareSpriteSheet_1
+  - first:
+      213: 3367677270243704767
+    second: SquareSpriteSheet_2
+  - first:
+      213: -4041498563876389297
+    second: SquareSpriteSheet_3
+  - first:
+      213: 4472357838190847232
+    second: SquareSpriteSheet_5
+  - first:
+      213: 7596800293672698388
+    second: SquareSpriteSheet_6
+  - first:
+      213: 2099693506668964636
+    second: SquareSpriteSheet_4
+  - first:
+      213: 6491750131929206445
+    second: SquareSpriteSheet_5
+  - first:
+      213: -1286060578572636190
+    second: SquareSpriteSheet_7
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -122,14 +149,14 @@ TextureImporter:
         width: 8
         height: 8
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f7af9c64ccf9f7fd0800000000000000
-      internalID: -2341977581499581825
+      spriteID: 40bb49f78feac73f0800000000000000
+      internalID: -901653443065365756
       vertices: []
       indices: 
       edges: []
@@ -143,14 +170,14 @@ TextureImporter:
         width: 8
         height: 8
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: aacdae53d865380c0800000000000000
-      internalID: -4574717631983330134
+      spriteID: 53162a199c379ef80800000000000000
+      internalID: -8076797147143315147
       vertices: []
       indices: 
       edges: []
@@ -160,18 +187,18 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 16
-        y: 16
+        y: 8
         width: 8
-        height: 8
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        height: 16
+      alignment: 9
+      pivot: {x: 0.5, y: 0.25}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0555dcc76ceecf3e0800000000000000
-      internalID: -2018475996704058032
+      spriteID: fbf780372a46cbe20800000000000000
+      internalID: 3367677270243704767
       vertices: []
       indices: 
       edges: []
@@ -185,14 +212,14 @@ TextureImporter:
         width: 8
         height: 8
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fde8b8a1500511110800000000000000
-      internalID: 1229852156099268319
+      spriteID: f4e75eb0876b9e7c0800000000000000
+      internalID: -4041498563876389297
       vertices: []
       indices: 
       edges: []
@@ -206,14 +233,56 @@ TextureImporter:
         width: 8
         height: 8
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 59a8c3fb5018e6cd0800000000000000
-      internalID: -2562969276243998059
+      spriteID: c1ba232ae1c932d10800000000000000
+      internalID: 2099693506668964636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SquareSpriteSheet_6
+      rect:
+        serializedVersion: 2
+        x: 8
+        y: 0
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 412c1f51e914d6960800000000000000
+      internalID: 7596800293672698388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SquareSpriteSheet_7
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 0
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2ef6b86b7bef62ee0800000000000000
+      internalID: -1286060578572636190
       vertices: []
       indices: 
       edges: []
