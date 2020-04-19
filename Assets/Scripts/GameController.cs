@@ -5,29 +5,68 @@ using UnityEngine.Tilemaps;
 
 public class GameController
 {
-    public bool[,] gameSpaces; //true/false for burnt/unburnt //TODO: filled with unburntFloor, burntFloor, and null
+    public enum FloorTypes { None, Normal, Burned }
+    public FloorTypes[,] gameSpaces;
     public List<Vector2Int> toons;
+    public List<Vector2Int> obstacles;
     public List<Vector2Int> fires;
     public List<Vector2Int> exits;
 
+    public struct GameState
+    {
+        public FloorTypes[,] gameSpaces;
+        public List<Vector2Int> toons;
+        public List<Vector2Int> obstacles;
+        public List<Vector2Int> fires;
+        public List<Vector2Int> exits;
+    }
+
     public GameController(int width, int height)
     {
-        gameSpaces = new bool[width, height];
-        //generate test
-        //toons
-        toons = new List<Vector2Int>();
-        toons.Add(new Vector2Int(2, 2));
-        toons.Add(new Vector2Int(4, 2));
-        //fires
-        fires = new List<Vector2Int>();
-        fires.Add(new Vector2Int(3, 2));
-        fires.Add(new Vector2Int(0, 0));
-        fires.Add(new Vector2Int(5, 0));
-        BurnFloors();
-        //exit
-        exits = new List<Vector2Int>();
-        exits.Add(new Vector2Int(2, 5));
+        gameSpaces = new FloorTypes[width, height];
+        Debug.Log("default spaces");
+        Debug.Log(gameSpaces[0, 0]);
     }
+
+    public GameController(GameState state)
+    {
+        gameSpaces = state.gameSpaces;
+        obstacles = state.obstacles;
+        toons = state.toons;
+        fires = state.fires;
+        exits = state.exits;
+    }
+
+    //TODO is there strut magic for this?
+    public GameState GetState()
+    {
+        GameState state;
+        state.gameSpaces = gameSpaces;
+        state.obstacles = obstacles;
+        state.toons = toons;
+        state.fires = fires;
+        state.exits = exits;
+        return state;
+    }
+
+/*
+    private void GenTestLvl() { 
+    //generate test
+    //toons
+    toons = new List<Vector2Int>();
+    toons.Add(new Vector2Int(2, 2));
+    toons.Add(new Vector2Int(4, 2));
+    //fires
+    fires = new List<Vector2Int>();
+    fires.Add(new Vector2Int(3, 2));
+    fires.Add(new Vector2Int(0, 0));
+    fires.Add(new Vector2Int(5, 0));
+    BurnFloors();
+    //exit
+    exits = new List<Vector2Int>();
+    exits.Add(new Vector2Int(2, 5));
+    }
+*/
 
     public Vector2Int GetSize()
     {
@@ -46,9 +85,9 @@ public class GameController
         //legal move: remove fire if exits, otherwise start fire
         if (!fires.Remove(playLoc))
         {
-            if (gameSpaces[playLoc.x, playLoc.y])
+            if (gameSpaces[playLoc.x, playLoc.y] == FloorTypes.Burned)
             {
-                Debug.Log("Already burnt"); //TODO surface this to UI
+                Debug.Log("Already burned"); //TODO surface this to UI
                 return false;
             }
             fires.Add(playLoc);
@@ -121,7 +160,7 @@ public class GameController
 
         if (removedToonCount > 0)
         {
-            Debug.LogError($"Burnt {removedToonCount} toons!");
+            Debug.LogError($"burned {removedToonCount} toons!");
             //FIXME show gameover screen
         }
     }
@@ -155,7 +194,7 @@ public class GameController
         List<Vector2Int> newFires = new List<Vector2Int>();
         foreach (Vector2Int fireLoc in fires)
         {
-            if (fireLoc == playLoc && !gameSpaces[fireLoc.x, fireLoc.y]) {
+            if (fireLoc == playLoc && gameSpaces[fireLoc.x, fireLoc.y] != FloorTypes.Normal) {
                 newFires.Add(playLoc);
                 continue;  //TODO cleaner? skip spreading recently placed fire
                 //FIXME bug; for some reason, the last fire, when clicked sticks around
@@ -164,7 +203,7 @@ public class GameController
             foreach (Vector2Int direction in cardinalDirections)
             {
                 Vector2Int newLoc = ClampToBoard(fireLoc + direction);
-                if (!gameSpaces[newLoc.x, newLoc.y])
+                if (gameSpaces[newLoc.x, newLoc.y] == FloorTypes.Normal)
                 {
                     newFires.Add(newLoc);
                 }
@@ -176,7 +215,7 @@ public class GameController
     private void BurnFloors() { 
         foreach (Vector2Int fireLoc in fires)
         {
-            gameSpaces[fireLoc.x, fireLoc.y] = true;
+            gameSpaces[fireLoc.x, fireLoc.y] = FloorTypes.Burned;
         }
     }
 

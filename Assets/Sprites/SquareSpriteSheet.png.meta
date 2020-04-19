@@ -44,6 +44,15 @@ TextureImporter:
   - first:
       213: -1286060578572636190
     second: SquareSpriteSheet_7
+  - first:
+      213: -4729613751891253801
+    second: SquareSpriteSheet_6
+  - first:
+      213: 2526854585898709160
+    second: SquareSpriteSheet_7
+  - first:
+      213: -5412957246132614894
+    second: SquareSpriteSheet_8
   externalObjects: {}
   serializedVersion: 11
   mipmaps:
@@ -249,6 +258,27 @@ TextureImporter:
       name: SquareSpriteSheet_6
       rect:
         serializedVersion: 2
+        x: 0
+        y: 0
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d528b9e9590d5eb0800000000000000
+      internalID: -4729613751891253801
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: SquareSpriteSheet_7
+      rect:
+        serializedVersion: 2
         x: 8
         y: 0
         width: 8
@@ -260,14 +290,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 412c1f51e914d6960800000000000000
-      internalID: 7596800293672698388
+      spriteID: 8a03f87abd0311320800000000000000
+      internalID: 2526854585898709160
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: SquareSpriteSheet_7
+      name: SquareSpriteSheet_8
       rect:
         serializedVersion: 2
         x: 16
@@ -281,8 +311,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 2ef6b86b7bef62ee0800000000000000
-      internalID: -1286060578572636190
+      spriteID: 21983ef401051e4b0800000000000000
+      internalID: -5412957246132614894
       vertices: []
       indices: 
       edges: []

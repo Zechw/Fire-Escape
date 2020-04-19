@@ -25,6 +25,8 @@ public class GameBoard : MonoBehaviour
 
     private GridLayout gridLayout;
 
+
+
     private void Awake()
     {
         gridLayout = gameObject.GetComponent<GridLayout>();
@@ -37,24 +39,75 @@ public class GameBoard : MonoBehaviour
 
         spriteLayers = gameObject.GetComponentsInChildren<SpriteLayerBase>();
 
-        /*
+        LoadTilemaps();
+
+    }
+
+    private void LoadTilemaps()
+    {        //TODO: efficency - this gets a lot of empy space
         //load tilemaps into gameBoard
         BoundsInt boardBounds = floorLayer.tilemap.cellBounds;
         Debug.Log(boardBounds);
-        gameSpaces = new Tile[boardBounds.size.x, boardBounds.size.y];
 
-        //TODO: efficency - this gets a lot of empy space
-        foreach (Vector3Int position in boardBounds.allPositionsWithin)
+        GameController.GameState gameState; 
+        gameState.gameSpaces = new GameController.FloorTypes[boardBounds.size.x, boardBounds.size.y];
+        gameState.toons = new List<Vector2Int>();
+        gameState.obstacles = new List<Vector2Int>();
+        gameState.fires = new List<Vector2Int>();
+        gameState.exits = new List<Vector2Int>();
+   
+        Vector3Int offset = boardBounds.position * -1;
+
+
+        foreach (Vector3Int tilemapPosition in boardBounds.allPositionsWithin)
         {
-            TileBase tile = floorLayer.tilemap.GetTile( position );
-            if (tile != null)
+            List<TileBase> sprites = new List<TileBase>();
+            foreach (SpriteLayerBase layer in spriteLayers)
             {
-                floorLayer.tilemap.SetTile(position, unknownTile);
+                TileBase tileFromMap = layer.tilemap.GetTile(tilemapPosition);
+                if (tileFromMap != null)
+                {
+                    sprites.Add(tileFromMap);
+                }
+
+            }
+
+            //offset position to 0,0 base & drop z
+            Vector2Int loc = (Vector2Int)(offset + tilemapPosition);
+
+            //parse floor
+            GameController.FloorTypes floor = GameController.FloorTypes.None;
+            if (sprites.Remove(unburntfloorTile))
+            {
+                floor = GameController.FloorTypes.Normal;
+            }
+            else if (sprites.Remove(burntFloorTile))
+            {
+                floor = GameController.FloorTypes.Burned;
+            }
+            gameState.gameSpaces[loc.x, loc.y] = floor;
+
+            //parse toons
+            if (sprites.Remove(toonTile))
+            {
+                gameState.toons.Add(loc);
+            }
+
+            //parse fire
+            if (sprites.Remove(fireTile))
+            {
+                gameState.fires.Add(loc);
+            }
+
+            //TODO parse obstacles
+            //parse exits
+            if (sprites.Remove(exitTile))
+            {
+                gameState.exits.Add(loc);
             }
         }
-        */
 
-        gameController = new GameController(6, 6);
+        gameController = new GameController(gameState);
     }
 
     private void Start()
@@ -76,10 +129,24 @@ public class GameBoard : MonoBehaviour
         {
             for (int y = 0; y < boardSize.y; y++)
             {
-                floorLayer.tilemap.SetTile(
-                    new Vector3Int(x, y, 0),
-                    gameController.gameSpaces[x, y]? burntFloorTile : unburntfloorTile
-                );
+                Tile tile;
+                switch (gameController.gameSpaces[x,y])
+                {
+                    case GameController.FloorTypes.None:
+                        tile = unknownTile;
+                        //TODO continue
+                        break;
+                    case GameController.FloorTypes.Normal:
+                        tile = unburntfloorTile;
+                        break;
+                    case GameController.FloorTypes.Burned:
+                        tile = burntFloorTile; //TODO rename burned
+                        break;
+                    default:
+                        tile = unknownTile;
+                        break;
+                }
+                floorLayer.tilemap.SetTile(new Vector3Int(x, y, 0),tile);
             }
         }
         //toons
@@ -87,6 +154,7 @@ public class GameBoard : MonoBehaviour
         {
             toonLayer.tilemap.SetTile(toonLoc, toonTile);
         }
+        //TODO obstacles
         //fires
         foreach (Vector3Int fireLoc in gameController.fires)
         {
