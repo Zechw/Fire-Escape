@@ -141,8 +141,8 @@ public class GameController
         }
 
         Vector2Int roundedVector = new Vector2Int(
-            (int)Mathf.Ceil(safetyVector.x),
-            (int)Mathf.Ceil(safetyVector.y)
+            safetyVector.x > 0 ? (int)Mathf.Ceil(safetyVector.x) : (int)Mathf.Floor(safetyVector.x),
+            safetyVector.y > 0 ? (int)Mathf.Ceil(safetyVector.y) : (int)Mathf.Floor(safetyVector.y)
         );
 
         Vector2Int desiredSpace = ClampToBoard(toons[toonI] + roundedVector);
