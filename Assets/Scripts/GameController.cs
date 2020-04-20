@@ -13,6 +13,9 @@ public class GameController
     public List<Vector2Int> fires;
     public List<Vector2Int> exits;
 
+    public enum PlayState { Playing, Won, Lost, OutOfSpacess}
+    public PlayState currentState;
+
     public struct GameState
     {
         public FloorTypes[,] gameSpaces;
@@ -24,13 +27,14 @@ public class GameController
 
     public GameController(int width, int height)
     {
+        currentState = PlayState.Playing;
         gameSpaces = new FloorTypes[width, height];
-        Debug.Log("default spaces");
-        Debug.Log(gameSpaces[0, 0]);
     }
 
     public GameController(GameState state)
     {
+        currentState = PlayState.Playing; //play state; different from save/game state
+        state = CullGameState(state);
         gameSpaces = state.gameSpaces;
         obstacles = state.obstacles;
         toons = state.toons;
@@ -218,7 +222,8 @@ public class GameController
 
     private void CheckBurns()
     {
-        int removedToonCount = 0;
+        /* int removedToonCount = 0;
+
         foreach (Vector2Int fireLoc in fires)
         {
             removedToonCount += toons.RemoveAll(t => t == fireLoc);
@@ -228,6 +233,14 @@ public class GameController
         {
             Debug.LogError($"burned {removedToonCount} toons!");
             //FIXME show gameover screen
+        } */
+        foreach (Vector2Int fireLoc in fires)
+        {
+            if (toons.Contains(fireLoc))
+            {
+                //Debug.Log("LOSS");
+                currentState = PlayState.Lost;
+            }
         }
     }
 
@@ -242,8 +255,8 @@ public class GameController
             Debug.Log($"Saved {exitingToonsCount} toons!");
             if (toons.Count == 0)
             {
-                Debug.LogError("Level complete!");
-                //FIXME next level
+                //Debug.Log("WIN");
+                currentState = PlayState.Won;
             }
         }
     }
@@ -290,4 +303,175 @@ public class GameController
         int newY = Mathf.Clamp(vector.y, 0, gameSpaces.GetLength(1) - 1);
         return new Vector2Int(newX, newY);
     } 
+
+    private static GameState CullGameState(GameState state)
+    {
+        //cull low x
+        while (IsRowEmpty(state, 0))
+        {
+            FloorTypes[,] newGameSpaces = new FloorTypes[state.gameSpaces.GetLength(0), state.gameSpaces.GetLength(1) - 1];
+            for (int x = 0; x < state.gameSpaces.GetLength(0); x++)
+            {
+                for (int y = 1; y < state.gameSpaces.GetLength(1); y++)
+                {
+                    newGameSpaces[x, y - 1] = state.gameSpaces[x, y];
+                }
+            }
+            state.gameSpaces = newGameSpaces;
+            state = MoveObjectsDown(state);
+        }
+
+        //cull low y
+        while (IsColumnEmpty(state, 0))
+        {
+            FloorTypes[,] newGameSpaces = new FloorTypes[state.gameSpaces.GetLength(0) - 1, state.gameSpaces.GetLength(1)];
+            for (int x = 1; x < state.gameSpaces.GetLength(0); x++)
+            {
+                for (int y = 0; y < state.gameSpaces.GetLength(1); y++)
+                {
+                    newGameSpaces[x - 1, y] = state.gameSpaces[x, y];
+                }
+            }
+            state.gameSpaces = newGameSpaces;
+            state = MoveObjectsLeft(state);
+        }
+
+        //cull high x
+        while(IsRowEmpty(state, state.gameSpaces.GetLength(1) - 1 ))
+        {
+            FloorTypes[,] newGameSpaces = new FloorTypes[state.gameSpaces.GetLength(0), state.gameSpaces.GetLength(1) - 1];
+            for (int x = 0; x < state.gameSpaces.GetLength(0); x++)
+            {
+                for (int y = 0; y < state.gameSpaces.GetLength(1) - 1; y++)
+                {
+                    newGameSpaces[x, y] = state.gameSpaces[x, y];
+                }
+            }
+            state.gameSpaces = newGameSpaces;
+        }
+
+        //cull high y
+        while (IsColumnEmpty(state, state.gameSpaces.GetLength(0) - 1))
+        {
+            FloorTypes[,] newGameSpaces = new FloorTypes[state.gameSpaces.GetLength(0) -1, state.gameSpaces.GetLength(1)];
+            for (int x = 0; x < state.gameSpaces.GetLength(0) - 1; x++)
+            {
+                for (int y = 0; y < state.gameSpaces.GetLength(1); y++)
+                {
+                    newGameSpaces[x, y] = state.gameSpaces[x, y];
+                }
+            }
+            state.gameSpaces = newGameSpaces;
+        }
+
+        return state;
+    }
+
+    private static bool IsRowEmpty(GameState state, int row)
+    {
+        for (int i = 0; i < state.gameSpaces.GetLength(0); i++)
+        {
+            if (state.gameSpaces[i, row] != FloorTypes.None)
+            {
+                return false;
+            }
+        }
+        foreach (List<Vector2Int> objectList in new List<Vector2Int>[] { state.toons, state.exits, state.fires, state.obstacles })
+        {
+            foreach (Vector2Int objectLoc in objectList)
+            {
+                if (objectLoc.y == row)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static bool IsColumnEmpty(GameState state, int col)
+    {
+        for (int i = 0; i < state.gameSpaces.GetLength(1); i++)
+        {
+            if (state.gameSpaces[col, i] != FloorTypes.None)
+            {
+                return false;
+            }
+        }
+        foreach (List<Vector2Int> objectList in new List<Vector2Int>[] { state.toons, state.exits, state.fires, state.obstacles })
+        {
+            foreach (Vector2Int objectLoc in objectList)
+            {
+                if (objectLoc.x == col)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private static GameState MoveObjectsDown(GameState state) //culling minX
+    {
+        List<Vector2Int> newFires = new List<Vector2Int>();
+        List<Vector2Int> newToons = new List<Vector2Int>();
+        List<Vector2Int> newObstacles = new List<Vector2Int>();
+        List<Vector2Int> newExits = new List<Vector2Int>();
+
+        foreach (Vector2Int loc in state.fires)
+        {
+            newFires.Add(loc + Vector2Int.down);
+        }
+        foreach (Vector2Int loc in state.toons)
+        {
+            newToons.Add(loc + Vector2Int.down);
+        }
+        foreach (Vector2Int loc in state.obstacles)
+        {
+            newObstacles.Add(loc + Vector2Int.down);
+        }
+        foreach (Vector2Int loc in state.exits)
+        {
+            newExits.Add(loc + Vector2Int.down);
+        }
+
+        state.fires = newFires;
+        state.toons = newToons;
+        state.obstacles = newObstacles;
+        state.exits = newExits;
+
+        return state;
+    }
+
+    private static GameState MoveObjectsLeft(GameState state) //culling minY
+    {
+        List<Vector2Int> newFires = new List<Vector2Int>();
+        List<Vector2Int> newToons = new List<Vector2Int>();
+        List<Vector2Int> newObstacles = new List<Vector2Int>();
+        List<Vector2Int> newExits = new List<Vector2Int>();
+
+        foreach (Vector2Int loc in state.fires)
+        {
+            newFires.Add(loc + Vector2Int.left);
+        }
+        foreach (Vector2Int loc in state.toons)
+        {
+            newToons.Add(loc + Vector2Int.left);
+        }
+        foreach (Vector2Int loc in state.obstacles)
+        {
+            newObstacles.Add(loc + Vector2Int.left);
+        }
+        foreach (Vector2Int loc in state.exits)
+        {
+            newExits.Add(loc + Vector2Int.left);
+        }
+
+        state.fires = newFires;
+        state.toons = newToons;
+        state.obstacles = newObstacles;
+        state.exits = newExits;
+
+        return state;
+    }
 }

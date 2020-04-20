@@ -22,9 +22,9 @@ public class GameBoard : MonoBehaviour
     private ToonLayer toonLayer;
     private ExitLayer exitLayer;
 
-    public Grid levelGrid;
-
     private GridLayout gridLayout;
+
+    private GameMaster gameMaster;
 
 
 
@@ -38,8 +38,7 @@ public class GameBoard : MonoBehaviour
         toonLayer = gameObject.GetComponentInChildren<ToonLayer>();
         exitLayer = gameObject.GetComponentInChildren<ExitLayer>();
 
-        LoadTilemaps();
-
+        gameMaster = gameObject.GetComponentInParent<GameMaster>();
     }
 
     private void Start()
@@ -47,10 +46,11 @@ public class GameBoard : MonoBehaviour
         RenderTiles();
     }
 
-    private void LoadTilemaps()
+    public void LoadTilemaps(Grid levelGrid)
     {        //TODO: efficency - this gets a lot of empy space
         //load tilemaps into gameBoard
         BoundsInt boardBounds = levelGrid.GetComponentInChildren<Tilemap>().cellBounds; //fixme only looks at first layer
+        Vector3Int offset = boardBounds.position * -1;
 
         GameController.GameState gameState; 
         gameState.gameSpaces = new GameController.FloorTypes[boardBounds.size.x, boardBounds.size.y];
@@ -59,8 +59,6 @@ public class GameBoard : MonoBehaviour
         gameState.fires = new List<Vector2Int>();
         gameState.exits = new List<Vector2Int>();
    
-        Vector3Int offset = boardBounds.position * -1;
-
 
         foreach (Vector3Int tilemapPosition in boardBounds.allPositionsWithin)
         {
@@ -111,11 +109,17 @@ public class GameBoard : MonoBehaviour
         }
 
         gameController = new GameController(gameState);
+        RenderTiles();
     }
 
     // place tiles in desired positions, for rendering
     private void RenderTiles()
     {
+        if (gameController == null)
+        {
+            return;
+        }
+
         //clear
         foreach (SpriteLayerBase l in new SpriteLayerBase[] { floorLayer, toonLayer, fireLayer, exitLayer })
         {
@@ -171,10 +175,25 @@ public class GameBoard : MonoBehaviour
         // - if raycast, could save the collider & rigidbody
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         Vector3Int cellPosition = gridLayout.WorldToCell(mousePosition);
-
         if (gameController.MakePlay(new Vector2Int(cellPosition.x, cellPosition.y)))
         {
             RenderTiles();
+            switch (gameController.currentState)
+            {
+                case GameController.PlayState.Won:
+                    gameMaster.Success();
+                    break;
+                case GameController.PlayState.Lost:
+                    gameMaster.Failure();
+                    break;
+                default:
+                    foreach (GameController.FloorTypes floor in gameController.gameSpaces)
+                    {
+                        Debug.Log(floor);
+                    }
+                    break;
+            }
+
         }
     }
 }
