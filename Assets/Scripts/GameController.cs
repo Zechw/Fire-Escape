@@ -80,10 +80,11 @@ public class GameController
             fires.Add(playLoc);
         }
 
+        CheckExits();
         MoveToons();
         SpreadFires(playLoc);
         CheckBurns();
-        CheckExits();
+
 
         return true;
     }

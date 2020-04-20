@@ -189,7 +189,7 @@ public class GameBoard : MonoBehaviour
                 default:
                     foreach (GameController.FloorTypes floor in gameController.gameSpaces)
                     {
-                        Debug.Log(floor);
+                        //TODO if game is out of unburnt tiles
                     }
                     break;
             }
