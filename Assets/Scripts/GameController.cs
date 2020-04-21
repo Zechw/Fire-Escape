@@ -78,16 +78,28 @@ public class GameController
                 return false;
             }
             fires.Add(playLoc);
+            //TODO decouple. currently, we have to add this so toons run correctly, but prevent it from spreading later.
         }
 
+        AdvanceTurn(playLoc);
+        return true;
+    }
+
+    public void SkipTurn()
+    {
+        AdvanceTurn(new Vector2Int(-1, -1));
+        //FIXME assumes fire not spreading from -1, -1 would be a no-op
+    }
+
+    private void AdvanceTurn(Vector2Int playLoc)
+    {
         CheckExits();
         MoveToons();
         SpreadFires(playLoc);
         CheckBurns();
-
-
-        return true;
     }
+
+
 
     private void MoveToons() {
         for (int toonI = 0; toonI < toons.Count; toonI++)

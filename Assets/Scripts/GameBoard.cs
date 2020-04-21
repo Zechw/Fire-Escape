@@ -177,23 +177,27 @@ public class GameBoard : MonoBehaviour
         Vector3Int cellPosition = gridLayout.WorldToCell(mousePosition);
         if (gameController.MakePlay(new Vector2Int(cellPosition.x, cellPosition.y)))
         {
-            RenderTiles();
-            switch (gameController.currentState)
-            {
-                case GameController.PlayState.Won:
-                    gameMaster.Success();
-                    break;
-                case GameController.PlayState.Lost:
-                    gameMaster.Failure();
-                    break;
-                default:
-                    foreach (GameController.FloorTypes floor in gameController.gameSpaces)
-                    {
-                        //TODO if game is out of unburnt tiles
-                    }
-                    break;
-            }
+            AdvanceState();
+        }
+    }
 
+    public void AdvanceState()
+    {
+        RenderTiles();
+        switch (gameController.currentState)
+        {
+            case GameController.PlayState.Won:
+                gameMaster.Success();
+                break;
+            case GameController.PlayState.Lost:
+                gameMaster.Failure();
+                break;
+            default:
+                foreach (GameController.FloorTypes floor in gameController.gameSpaces)
+                {
+                    //TODO if game is out of unburnt tiles
+                }
+                break;
         }
     }
 }

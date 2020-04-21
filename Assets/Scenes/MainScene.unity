@@ -659,7 +659,7 @@ PrefabInstance:
     - target: {fileID: 6906123549680008059, guid: 0a0a8a8bd49219a40b9e33629b802530,
         type: 3}
       propertyPath: m_Name
-      value: RenderGrid
+      value: GameBoard
       objectReference: {fileID: 0}
     - target: {fileID: 6906123549720952802, guid: 0a0a8a8bd49219a40b9e33629b802530,
         type: 3}
@@ -3120,6 +3120,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 519420032}
     m_Modifications:
+    - target: {fileID: 3094501035331281657, guid: 2b04a3f8ddd2b84479b86fcca451ab5d,
+        type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 366659508}
     - target: {fileID: 3252828021787938839, guid: 2b04a3f8ddd2b84479b86fcca451ab5d,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
@@ -3135,6 +3140,11 @@ PrefabInstance:
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
       objectReference: {fileID: 366659508}
+    - target: {fileID: 3252828022582852519, guid: 2b04a3f8ddd2b84479b86fcca451ab5d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3252828022747008363, guid: 2b04a3f8ddd2b84479b86fcca451ab5d,
         type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target

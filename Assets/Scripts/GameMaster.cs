@@ -8,7 +8,7 @@ public class GameMaster : MonoBehaviour
     public Grid[] levels;
     private int levelI = 0;
 
-    private GameBoard renderGrid;
+    private GameBoard gameBoard;
 
     // UI components //FIXME cleaner mgmt... #ludumCrunch
     public GameObject winScreen;
@@ -24,7 +24,7 @@ public class GameMaster : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        renderGrid = gameObject.GetComponentInChildren<GameBoard>();
+        gameBoard = gameObject.GetComponentInChildren<GameBoard>();
         loading.SetActive(false);
         mainMenu.SetActive(true);
     }
@@ -48,10 +48,16 @@ public class GameMaster : MonoBehaviour
 
     public void LoadLevel()
     {
-        renderGrid.LoadTilemaps(levels[levelI]);
+        gameBoard.LoadTilemaps(levels[levelI]);
         winScreen.SetActive(false);
         loseScreen.SetActive(false);
-        restart.SetActive(true);
+        restart.SetActive(true); //FIXME PassTurn button is child'ed to save me from toggling it too. group to single game obj
+    }
+
+    public void SkipTurn()
+    {
+        gameBoard.gameController.SkipTurn();
+        gameBoard.AdvanceState(); //overcoupled
     }
 
     public void NextLevel()
