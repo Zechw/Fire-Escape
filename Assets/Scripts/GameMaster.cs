@@ -10,10 +10,13 @@ public class GameMaster : MonoBehaviour
 
     private GameBoard renderGrid;
 
+    // UI components //FIXME cleaner mgmt... #ludumCrunch
     public GameObject winScreen;
     public GameObject loseScreen;
     public GameObject restart;
     public GameObject endOfGame;
+    public GameObject mainMenu;
+    public GameObject loading;
 
 
     private 
@@ -22,6 +25,8 @@ public class GameMaster : MonoBehaviour
     void Start()
     {
         renderGrid = gameObject.GetComponentInChildren<GameBoard>();
+        loading.SetActive(false);
+        mainMenu.SetActive(true);
     }
 
     // Update is called once per frame
